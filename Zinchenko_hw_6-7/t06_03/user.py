@@ -3,21 +3,18 @@ class HashTable:
         self.size = size
         self.table = [None] * self.size
         self.num_elements = 0
-        self.deleted = set()
+        self.deleted = []  
 
     def _hash(self, key):
-        """Хеш-функція для перетворення ключа на індекс"""
         hash_value = 0
         for char in key:
             hash_value = (hash_value * 31 + ord(char)) % self.size
         return hash_value
 
     def _probe(self, index, attempt):
-        """Квадратичне пробування для вирішення колізій"""
         return (index + attempt ** 2) % self.size
 
     def _resize(self):
-        """Збільшує розмір хеш-таблиці, коли вона заповнена більш ніж на 50%"""
         old_table = self.table
         self.size = self._next_prime(self.size * 2)
         self.table = [None] * self.size
@@ -30,7 +27,6 @@ class HashTable:
                     self.insert(author, title)
 
     def _next_prime(self, n):
-        """Знаходимо наступне просте число більше за n"""
         def is_prime(num):
             if num < 2:
                 return False
@@ -44,7 +40,6 @@ class HashTable:
         return n
 
     def insert(self, author, title):
-        """Додає книгу до бібліотеки"""
         if self.num_elements >= self.size // 2:
             self._resize()
 
@@ -65,7 +60,6 @@ class HashTable:
         self.num_elements += 1
 
     def find(self, author, title):
-        """Перевіряє, чи є книга в бібліотеці"""
         index = self._hash(author)
         attempt = 0
         while self.table[index] is not None:
@@ -80,7 +74,6 @@ class HashTable:
         return False
 
     def delete(self, author, title):
-        """Видаляє книгу з бібліотеки"""
         index = self._hash(author)
         attempt = 0
         while self.table[index] is not None:
@@ -96,13 +89,12 @@ class HashTable:
                 else:
                     self.table[index] = (author, tuple(titles))  
                 self.num_elements -= 1
-                self.deleted.add((author, title))  
+                self.deleted.append((author, title))  
                 return
             attempt += 1
             index = self._probe(index, attempt)
 
     def findByAuthor(self, author):
-        """Повертає список книг автора, відсортованих за алфавітом"""
         books = []
         index = self._hash(author)
         attempt = 0
@@ -116,6 +108,7 @@ class HashTable:
             attempt += 1
             index = self._probe(index, attempt)
         return sorted(books)  
+
 
 library_catalog = None
 
@@ -134,4 +127,3 @@ def delete(author, title):
 
 def findByAuthor(author):
     return library_catalog.findByAuthor(author)
-
